@@ -1,15 +1,66 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="root">
+    <div class="row" v-if="!imgLoaded.value">
+      <input type="file" name="img" id="img" accept="image/*" @change="onFileSelect">
+    </div>
+    <img alt="" ref="imgDisp" style="max-width: 600px;">
+    <canvas ref="canvas" v-show="false"/>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import {ref} from "vue"
+import Color from "./util/Color";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
+  },
+  setup(props){
+
+    const canvas = ref(null);
+    const imgDisp = ref(null);
+    const imgLoaded = ref(false);
+    const canvasSize = ref(100);
+
+    const onFileSelect = (e) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let img = imgDisp.value;
+        
+        img.onload = () => {
+          //rescale image and draw it on canvas
+          let ratio = canvasSize.value/Math.max(img.width, img.height);
+          let w = ratio * img.width;
+          let h = ratio * img.height;
+          canvas.value.width = w;
+          canvas.value.height = h;
+          let ctx = canvas.value.getContext('2d');
+          ctx.drawImage(img,0,0,w,h);
+
+          genPalette(ctx.getImageData(0,0,w,h));
+
+          imgLoaded.value = true;
+
+        };
+        img.src = e.target.result;
+      };
+
+      reader.readAsDataURL(e.target.files[0]);
+    };
+
+    const genPalette = (imgData) => {
+      console.log(Color.getPixelsDecimal(imgData));
+    }
+
+
+    return {
+      canvas,
+      imgDisp,
+      onFileSelect,
+      imgLoaded,
+      canvasSize
+    };
   }
 }
 </script>
@@ -23,4 +74,15 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+.root{
+  width: 900px;
+  margin:0 auto;
+}
+
+.row{
+  width: 100%;
+  margin: 30px 0;
+}
+
 </style>
