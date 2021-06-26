@@ -1,4 +1,4 @@
-const means = new Array(5);
+const means = new Array(5).fill();
 let pts = [];
 
 function initMeans(){
@@ -34,23 +34,25 @@ function assignClusters(){
 
 function calcNewMeans(){
     let totals = new Array(5).fill(0);
-    let sizes = new Array(5).fill(0);
+    let clusterSizes = new Array(5).fill(0);
 
     for(let i = 0; i < pts.length; i++){
         let mInd = pts[i].mean;
 
         totals[mInd] += pts[i].val;
-        sizes[mInd] += 1;
+        clusterSizes[mInd] += 1;
     }
 
     for(let j = 0; j < 5; j++){
-        means[j] = totals[j]/sizes[j];
+        means[j] = Math.floor(totals[j]/clusterSizes[j]);
+        if(isNaN(means[j])) means[j] = 0;
+        
     }
 }
 
 
 function runIteration(max = 100){
-    if(pts.size == 0) return;
+    if(pts.length == 0) return;
     
     for(let i = 0; i < max; i++){
         let re = assignClusters();
@@ -58,14 +60,56 @@ function runIteration(max = 100){
             break;
         }
         else calcNewMeans();
+        if(i == max - 1){
+            assignClusters();
+        }
+    }
+}
+
+function getKMeans(max = 100){
+    if(pts.length == 0) return;
+    
+    let minVarSum = Number.MAX_SAFE_INTEGER;    
+    let minVarMeans = [];
+    for(let i = 0; i < max; i++){
+        runIteration();
+        let currVar = calcVarianceSum();
+        if(currVar < minVarSum){
+            minVarSum = currVar;
+            minVarMeans = [];
+            minVarMeans.push(...means);
+        }
     }
 
-    
+    return minVarMeans;
+}
+
+function calcVarianceSum(){
+    let varSum = 0;
+    let diffSqTotals = new Array(5).fill(0);
+    let clusterSizes = new Array(5).fill(0);
+
+    for(let i = 0; i < pts.length; i++){
+        let mInd = pts[i].mean;
+
+        diffSqTotals[mInd] += Math.pow(pts[i].diff, 2);
+        clusterSizes[mInd] += 1;
+    }
+
+    for(let j = 0; j < 5; j++){
+        let variance = diffSqTotals[j]/clusterSizes[j];
+        if(isNaN(variance)) variance = 0; 
+        varSum += variance;
+    }
+
+    return varSum;
 }
 
 module.exports = {
     init,
     runIteration,
+    calcVarianceSum,
+    getKMeans,
     pts,
     means
 }
