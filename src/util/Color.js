@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     getPixelsDecimal(cImgData){
         let decimalPixels = [];
         let w = cImgData.width;
@@ -11,7 +11,9 @@ export default {
                 //convert rgb to decimal
                 let decimal = data[red] * 65536 + data[red + 1] * 256 + data[red + 2];
                 
-                decimalPixels.push(decimal);
+                decimalPixels.push({
+                    val: decimal
+                });
             }
         }
         return decimalPixels;

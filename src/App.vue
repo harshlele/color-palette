@@ -10,7 +10,8 @@
 
 <script>
 import {ref} from "vue"
-import Color from "./util/Color";
+import {getPixelsDecimal} from "./util/Color";
+import kmeans from "./util/kmeans";
 
 export default {
   name: "App",
@@ -21,13 +22,13 @@ export default {
     const canvas = ref(null);
     const imgDisp = ref(null);
     const imgLoaded = ref(false);
-    const canvasSize = ref(100);
+    const canvasSize = ref(50);
 
     const onFileSelect = (e) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         let img = imgDisp.value;
-        
+
         img.onload = () => {
           //rescale image and draw it on canvas
           let ratio = canvasSize.value/Math.max(img.width, img.height);
@@ -50,7 +51,8 @@ export default {
     };
 
     const genPalette = (imgData) => {
-      console.log(Color.getPixelsDecimal(imgData));
+      kmeans.init(getPixelsDecimal(imgData));
+      kmeans.runIteration();
     }
 
 
@@ -72,7 +74,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 30px;
 }
 
 .root{
