@@ -3,14 +3,17 @@
     <div class="row" v-if="!imgLoaded.value">
       <input type="file" name="img" id="img" accept="image/*" @change="onFileSelect">
     </div>
-    <img alt="" ref="imgDisp" style="max-width: 600px;">
+    <img alt="" ref="imgDisp" style="max-width: 400px;">
     <canvas ref="canvas" v-show="false"/>
+    <div class="color-palette">
+      <div class="color" v-for="i in 5" :key="i" :id="i - 1" :ref="setColorDivs"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import {ref} from "vue"
-import {getPixelsDecimal} from "./util/Color";
+import {getPixelsDecimal,decimalToRGB} from "./util/Color";
 import kmeans from "./util/kmeans";
 
 export default {
@@ -22,7 +25,15 @@ export default {
     const canvas = ref(null);
     const imgDisp = ref(null);
     const imgLoaded = ref(false);
-    const canvasSize = ref(50);
+    const canvasSize = ref(100);
+
+    const colorDivs = [];
+    const setColorDivs = (el) => {
+      if(el){
+        colorDivs[parseInt(el.id)] = el;
+      }
+    }
+
 
     const onFileSelect = (e) => {
       const reader = new FileReader();
@@ -52,7 +63,12 @@ export default {
 
     const genPalette = (imgData) => {
       kmeans.init(getPixelsDecimal(imgData));
-      kmeans.runIteration();
+      let means = kmeans.getKMeans(100);
+      means.forEach((m,i) => {
+        let rgb = decimalToRGB(Math.trunc(m));
+        //console.log(colorDivs);
+        colorDivs[i].style.backgroundColor = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+      })
     }
 
 
@@ -61,7 +77,8 @@ export default {
       imgDisp,
       onFileSelect,
       imgLoaded,
-      canvasSize
+      canvasSize,
+      setColorDivs
     };
   }
 }
@@ -85,6 +102,16 @@ export default {
 .row{
   width: 100%;
   margin: 30px 0;
+}
+
+.color-palette{
+  width: 100%;
+  display: flex;
+}
+
+.color{
+  width: 180px;
+  height: 100px;
 }
 
 </style>

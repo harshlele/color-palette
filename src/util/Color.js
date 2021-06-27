@@ -17,5 +17,13 @@ module.exports = {
             }
         }
         return decimalPixels;
+    },
+
+    decimalToRGB(c){
+        var r = Math.floor(c / (256*256));
+        var g = Math.floor(c / 256) % 256;
+        var b = c % 256;
+
+        return [r,g,b];
     }
 }
