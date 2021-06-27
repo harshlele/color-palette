@@ -25,7 +25,7 @@ export default {
     const canvas = ref(null);
     const imgDisp = ref(null);
     const imgLoaded = ref(false);
-    const canvasSize = ref(100);
+    const canvasSize = ref(50);
 
     const colorDivs = [];
     const setColorDivs = (el) => {
@@ -63,7 +63,7 @@ export default {
 
     const genPalette = (imgData) => {
       kmeans.init(getPixelsDecimal(imgData));
-      let means = kmeans.getKMeans(100);
+      let means = kmeans.getKMeans(10);
       means.forEach((m,i) => {
         let rgb = decimalToRGB(Math.trunc(m));
         //console.log(colorDivs);
@@ -107,6 +107,7 @@ export default {
 .color-palette{
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
 }
 
 .color{

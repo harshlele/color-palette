@@ -1,8 +1,9 @@
-const means = new Array(5).fill();
+const clusters = 5;
+const means = new Array(clusters).fill();
 let pts = [];
 
 function initMeans(){
-    for(let i = 0; i < 5;i++){
+    for(let i = 0; i < clusters;i++){
         means[i] = pts[Math.floor(Math.random() * pts.length)].val;
     }
 }
@@ -19,7 +20,7 @@ function diff(p1,p2){
 function assignClusters(){
     let reAssign = false;
     for(let j = 0; j < pts.length; j++){
-        for(let k = 0; k < 5; k++){
+        for(let k = 0; k < clusters; k++){
             if( !pts[j].diff || pts[j].diff > diff(pts[j].val,means[k]) ){
                 pts[j].diff = diff(pts[j].val,means[k]);
                 pts[j].mean = k;
@@ -33,8 +34,8 @@ function assignClusters(){
 }
 
 function calcNewMeans(){
-    let totals = new Array(5).fill(0);
-    let clusterSizes = new Array(5).fill(0);
+    let totals = new Array(clusters).fill(0);
+    let clusterSizes = new Array(clusters).fill(0);
 
     for(let i = 0; i < pts.length; i++){
         let mInd = pts[i].mean;
@@ -43,7 +44,7 @@ function calcNewMeans(){
         clusterSizes[mInd] += 1;
     }
 
-    for(let j = 0; j < 5; j++){
+    for(let j = 0; j < clusters; j++){
         means[j] = Math.floor(totals[j]/clusterSizes[j]);
         if(isNaN(means[j])) means[j] = 0;
         
@@ -69,13 +70,13 @@ function runIteration(max = 100){
 function getKMeans(max = 100){
     if(pts.length == 0) return;
     
-    let minVarSum = Number.MAX_SAFE_INTEGER;    
+    let minCost = Number.MAX_SAFE_INTEGER;    
     let minVarMeans = [];
     for(let i = 0; i < max; i++){
         runIteration();
-        let currVar = calcVarianceSum();
-        if(currVar < minVarSum){
-            minVarSum = currVar;
+        let cost = calcCost();
+        if(cost < minCost){
+            minCost = cost;
             minVarMeans = [];
             minVarMeans.push(...means);
         }
@@ -84,31 +85,26 @@ function getKMeans(max = 100){
     return minVarMeans;
 }
 
-function calcVarianceSum(){
-    let varSum = 0;
-    let diffSqTotals = new Array(5).fill(0);
-    let clusterSizes = new Array(5).fill(0);
+function calcCost(){
+    let tCost = 0;
+    let cost = new Array(clusters).fill(0);
 
     for(let i = 0; i < pts.length; i++){
         let mInd = pts[i].mean;
-
-        diffSqTotals[mInd] += Math.pow(pts[i].diff, 2);
-        clusterSizes[mInd] += 1;
+        cost[mInd] += Math.pow(pts[i].diff, 2);
     }
 
-    for(let j = 0; j < 5; j++){
-        let variance = diffSqTotals[j]/clusterSizes[j];
-        if(isNaN(variance)) variance = 0; 
-        varSum += variance;
+    for(let j = 0; j < clusters; j++){
+        tCost += cost[j];
     }
 
-    return varSum;
+    return tCost;
 }
 
 module.exports = {
     init,
     runIteration,
-    calcVarianceSum,
+    calcCost,
     getKMeans,
     pts,
     means
