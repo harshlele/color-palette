@@ -63,8 +63,9 @@ export default {
 
     const genPalette = (imgData) => {
       kmeans.init(getPixelsDecimal(imgData));
-      let means = kmeans.getKMeans(10);
-      means.forEach((m,i) => {
+      let colors = kmeans.getKCentroids(10);
+      colors.sort((a,b) => a-b);
+      colors.forEach((m,i) => {
         let rgb = decimalToRGB(Math.trunc(m));
         //console.log(colorDivs);
         colorDivs[i].style.backgroundColor = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
