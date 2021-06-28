@@ -1,5 +1,9 @@
 # image-palette
 
+Simple website that generates a color palette from an image using k-means/k-median clustering.
+
+![example](assets/ex.png)
+
 ## Project setup
 ```
 npm install

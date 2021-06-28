@@ -25,5 +25,28 @@ module.exports = {
         var b = c % 256;
 
         return [r,g,b];
+    },
+
+    rgbToHex(r,g,b){
+        return "#"
+                + r.toString(16).padStart(2,"0").toUpperCase()
+                + g.toString(16).padStart(2,"0").toUpperCase()
+                + b.toString(16).padStart(2,"0").toUpperCase();
+    },
+
+    getTextColor(r,g,b){
+        let hsp = Math.sqrt(
+            0.299 * (r * r) +
+            0.587 * (g * g) +
+            0.114 * (b * b)
+            );
+
+        if (hsp>127.5) {
+            return "black";
+        } 
+        else {
+    
+            return "white";
+        }
     }
 }
