@@ -9,7 +9,7 @@
       <div class="color" v-for="p,i in paletteColors" :key="i" :id="`p-${i}`"  :style="`background-color: ${p.rgb}; color: ${p.color}`">
         
         <div class="color-code">
-          <button class="btn-copy">
+          <button class="btn-copy" @click="copyCode($event,p.rgb)">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12pt" height="12pt" viewBox="0 0 12 12" version="1.1">
               <g id="surface1">
               <path :style="`stroke:none;fill-rule:nonzero;fill:${p.color};fill-opacity:1;`" d="M 8 0.5 L 2 0.5 C 1.449219 0.5 1 0.949219 1 1.5 L 1 8.5 L 2 8.5 L 2 1.5 L 8 1.5 Z M 9.5 2.5 L 4 2.5 C 3.449219 2.5 3 2.949219 3 3.5 L 3 10.5 C 3 11.050781 3.449219 11.5 4 11.5 L 9.5 11.5 C 10.050781 11.5 10.5 11.050781 10.5 10.5 L 10.5 3.5 C 10.5 2.949219 10.050781 2.5 9.5 2.5 Z M 9.5 10.5 L 4 10.5 L 4 3.5 L 9.5 3.5 Z M 9.5 10.5 "/>
@@ -22,7 +22,7 @@
         </div>
 
 
-        <div class="color-code">
+        <div class="color-code" @click="copyCode($event,p.hex)">
           <button class="btn-copy">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12pt" height="12pt" viewBox="0 0 12 12" version="1.1">
               <g id="surface1">
@@ -108,6 +108,11 @@ export default {
 
     }
 
+    const copyCode = (e,txt) => {
+      navigator.clipboard.writeText(txt).then(() => {}).catch(e => {console.error(e);});
+      
+    }
+
 
     return {
       canvas,
@@ -115,7 +120,8 @@ export default {
       onFileSelect,
       imgLoaded,
       canvasSize,
-      paletteColors
+      paletteColors,
+      copyCode
     };
   }
 }
