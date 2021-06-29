@@ -6,9 +6,35 @@
     <img alt="" ref="imgDisp" style="max-width: 400px;">
     <canvas ref="canvas" v-show="false"/>
     <div class="color-palette">
-      <div class="color" v-for="i in 5" :key="i" :id="i - 1" :ref="setColorDivs">
-        <span id="rgb"></span>
-        <span id="hex"></span>
+      <div class="color" v-for="p,i in paletteColors" :key="i" :id="`p-${i}`"  :style="`background-color: ${p.rgb}; color: ${p.color}`">
+        
+        <div class="color-code">
+          <button class="btn-copy">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12pt" height="12pt" viewBox="0 0 12 12" version="1.1">
+              <g id="surface1">
+              <path :style="`stroke:none;fill-rule:nonzero;fill:${p.color};fill-opacity:1;`" d="M 8 0.5 L 2 0.5 C 1.449219 0.5 1 0.949219 1 1.5 L 1 8.5 L 2 8.5 L 2 1.5 L 8 1.5 Z M 9.5 2.5 L 4 2.5 C 3.449219 2.5 3 2.949219 3 3.5 L 3 10.5 C 3 11.050781 3.449219 11.5 4 11.5 L 9.5 11.5 C 10.050781 11.5 10.5 11.050781 10.5 10.5 L 10.5 3.5 C 10.5 2.949219 10.050781 2.5 9.5 2.5 Z M 9.5 10.5 L 4 10.5 L 4 3.5 L 9.5 3.5 Z M 9.5 10.5 "/>
+              </g>
+            </svg>
+          </button>
+          <span id="rgb">
+            {{p.rgb}}
+          </span>
+        </div>
+
+
+        <div class="color-code">
+          <button class="btn-copy">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12pt" height="12pt" viewBox="0 0 12 12" version="1.1">
+              <g id="surface1">
+              <path :style="`stroke:none;fill-rule:nonzero;fill:${p.color};fill-opacity:1;`" d="M 8 0.5 L 2 0.5 C 1.449219 0.5 1 0.949219 1 1.5 L 1 8.5 L 2 8.5 L 2 1.5 L 8 1.5 Z M 9.5 2.5 L 4 2.5 C 3.449219 2.5 3 2.949219 3 3.5 L 3 10.5 C 3 11.050781 3.449219 11.5 4 11.5 L 9.5 11.5 C 10.050781 11.5 10.5 11.050781 10.5 10.5 L 10.5 3.5 C 10.5 2.949219 10.050781 2.5 9.5 2.5 Z M 9.5 10.5 L 4 10.5 L 4 3.5 L 9.5 3.5 Z M 9.5 10.5 "/>
+              </g>
+            </svg>
+          </button>
+          <span id="hex">
+            {{p.hex}}
+          </span>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -29,13 +55,8 @@ export default {
     const imgDisp = ref(null);
     const imgLoaded = ref(false);
     const canvasSize = ref(50);
+    const paletteColors = ref([]);
 
-    const colorDivs = [];
-    const setColorDivs = (el) => {
-      if(el){
-        colorDivs[parseInt(el.id)] = el;
-      }
-    }
 
 
     const onFileSelect = (e) => {
@@ -68,21 +89,23 @@ export default {
       kmeans.init(getPixelsDecimal(imgData));
       let colors = kmeans.getKCentroids(10);
       colors.sort((a,b) => a-b);
-      colors.forEach((m,i) => {
+
+      let palette = colors.map((m,i) => {
         let rgb = decimalToRGB(Math.trunc(m));
         let rgbStr = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
-
-        colorDivs[i].style.backgroundColor = rgbStr
-
-        let rgbSpan = colorDivs[i].querySelector("#rgb");
-        let hexSpan = colorDivs[i].querySelector("#hex");
         let txtColor = getTextColor(rgb[0],rgb[1],rgb[2]);
+        let hexStr = rgbToHex(rgb[0],rgb[1],rgb[2]);
 
-        rgbSpan.innerHTML = rgbStr;
-        rgbSpan.style.color = txtColor;
-        hexSpan.innerHTML = rgbToHex(rgb[0],rgb[1],rgb[2]);
-        hexSpan.style.color = txtColor;
-      })
+        return {
+          rgb: rgbStr,
+          color: txtColor,
+          hex: hexStr
+        };
+      });
+
+      paletteColors.value = [];
+      paletteColors.value.push(...palette);
+
     }
 
 
@@ -92,7 +115,7 @@ export default {
       onFileSelect,
       imgLoaded,
       canvasSize,
-      setColorDivs
+      paletteColors
     };
   }
 }
@@ -132,11 +155,23 @@ export default {
   align-items: center;
   justify-content: center;
 
-  span{
-    width: 100%;
-  }
 }
 
+.btn-copy{
+  border: none;
+  background-color: transparent;
+}
+
+.color-code{
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  padding: 0px 20px;
+
+  button:active, button:hover{
+    cursor: pointer;
+  }
+}
 
 
 </style>
